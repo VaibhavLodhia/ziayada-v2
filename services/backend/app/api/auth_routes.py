@@ -83,16 +83,37 @@ def _user_to_response(user: User) -> UserResponse:
 # --- Cookie helper --------------------------------------------------------
 
 
+def _cross_origin_cors() -> bool:
+    """Vercel/Railway split needs SameSite=None so the session cookie rides cross-origin fetches."""
+    return any(
+        origin.startswith("https://") and "localhost" not in origin and "127.0.0.1" not in origin
+        for origin in settings.cors_origin_list
+    )
+
+
+def _session_cookie_kwargs() -> dict[str, str | int | bool]:
+    cross_origin = _cross_origin_cors()
+    return {
+        "httponly": True,
+        "samesite": "none" if cross_origin else "lax",
+        "secure": cross_origin,
+        "max_age": settings.jwt_expire_days * 86400,
+        "path": "/",
+    }
+
+
 def _set_session_cookie(response: Response, user_id: str) -> None:
     token = create_access_token(user_id)
-    response.set_cookie(
-        key=COOKIE_NAME,
-        value=token,
-        httponly=True,
-        samesite="lax",
-        secure=False,  # dev only — flip True behind TLS in prod
-        max_age=settings.jwt_expire_days * 86400,
-        path="/",
+    response.set_cookie(key=COOKIE_NAME, value=token, **_session_cookie_kwargs())
+
+
+def _clear_session_cookie(response: Response) -> None:
+    kwargs = _session_cookie_kwargs()
+    response.delete_cookie(
+        COOKIE_NAME,
+        path=str(kwargs["path"]),
+        secure=bool(kwargs["secure"]),
+        samesite=str(kwargs["samesite"]),
     )
 
 
@@ -158,7 +179,7 @@ async def login(
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(response: Response) -> Response:
-    response.delete_cookie(COOKIE_NAME, path="/")
+    _clear_session_cookie(response)
     response.status_code = status.HTTP_204_NO_CONTENT
     return response
 
