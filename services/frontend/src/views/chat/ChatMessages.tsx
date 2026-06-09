@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react';
 import { HashSeal } from '@/components/primitives/HashSeal';
 import { StatePill } from '@/components/primitives/StatePill';
 import { TrustPill } from '@/components/primitives/TrustPill';
@@ -9,6 +10,19 @@ type ChatMessagesProps = {
 };
 
 export function ChatMessages({ messages, pending }: ChatMessagesProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const stickToBottomRef = useRef(true);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    if (messages.at(-1)?.role === 'user' || pending) {
+      stickToBottomRef.current = true;
+    }
+    if (!stickToBottomRef.current) return;
+    el.scrollTop = el.scrollHeight;
+  }, [messages, pending]);
+
   if (messages.length === 0 && !pending) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
@@ -23,7 +37,16 @@ export function ChatMessages({ messages, pending }: ChatMessagesProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-8">
+    <div
+      ref={scrollRef}
+      onScroll={() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+        stickToBottomRef.current = distanceFromBottom < 96;
+      }}
+      className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-6 py-8"
+    >
       {messages.map((msg, i) => {
         if (msg.role === 'user') {
           return (
