@@ -26,6 +26,14 @@ export function LoginView() {
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         setError('Invalid email or password.');
+      } else if (
+        err instanceof ApiError &&
+        (err.status === 405 || err.status === 404) &&
+        !import.meta.env.VITE_API_BASE_URL
+      ) {
+        setError(
+          'API not configured. Set VITE_API_BASE_URL in Vercel to your backend URL, then redeploy.',
+        );
       } else {
         setError(err instanceof Error ? err.message : 'Failed to sign in.');
       }

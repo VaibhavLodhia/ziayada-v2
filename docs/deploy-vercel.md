@@ -35,17 +35,34 @@ git push origin main
 3. **Root Directory:** blank (use repo-root `vercel.json`).
 4. Deploy.
 
-## Environment variables
+## Environment variables (REQUIRED for login)
 
-| Variable | Example |
-|----------|---------|
-| `VITE_API_BASE_URL` | `https://your-api-host.com` |
+**Without this, login shows `/api/auth/login 405`** — the browser hits Vercel static hosting, not FastAPI.
 
-Backend `CORS_ORIGINS` must include:
+### Vercel dashboard
+
+1. Project **ziayada-v2** → **Settings** → **Environment Variables**
+2. Add:
+
+| Name | Value | Environments |
+|------|-------|----------------|
+| `VITE_API_BASE_URL` | `https://YOUR-BACKEND-URL.com` | Production, Preview, Development |
+
+No trailing slash. Example: `https://ziayada-api.up.railway.app`
+
+3. **Deployments** → latest → **⋯** → **Redeploy** (Vite bakes env at **build** time — changing env without redeploy does nothing)
+
+### Backend (separate host — not Vercel)
+
+Deploy `services/backend` + Postgres on Railway, Render, or Fly. Then on the backend set:
 
 ```
-https://ziayada-v2.vercel.app
+CORS_ORIGINS=https://ziayada-v2.vercel.app
 ```
+
+Use the same secrets as `services/backend/.env.example` (`DATABASE_URL`, `JWT_SECRET`, `ADMIN_BOOTSTRAP_*`, etc.).
+
+Until the API is public, the Vercel UI will load but **auth and chat will not work**.
 
 ## CLI deploy
 
