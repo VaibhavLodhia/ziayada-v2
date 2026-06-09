@@ -1,75 +1,56 @@
-# Deploy ziyada-v2 on Vercel
+# Deploy ziayada-v2 on Vercel
 
-Vercel hosts the **frontend** (`services/frontend`). The FastAPI backend and Postgres still need a separate host (Railway, Render, Fly.io, or your own VPS).
+Vercel hosts the **frontend**. Backend + Postgres need Railway, Render, or similar.
 
-## 1. Push to GitHub
+## Fix 404 NOT_FOUND
 
-From the repo root (`ziyada-v2/`):
+That error means **no successful deployment** at that URL — not a routing bug.
 
-```bash
-git init
+1. Repo root has **`vercel.json`** — builds `services/frontend` automatically.
+2. In Vercel project **Settings → General**:
+   - **Root Directory:** leave **empty** (repo root) so root `vercel.json` is used  
+   - OR set `services/frontend` and remove duplicate build overrides
+3. **Settings → Build & Development:**
+   - Framework: Vite
+   - Build: `npm run build`
+   - Output: `dist`
+4. **Deployments** tab — open latest deploy. If **Failed**, read the build log.
+5. Production URL: **https://ziayada-v2.vercel.app** (spelling: **ziayada**)
+
+## GitHub push (Vaibhav only)
+
+```powershell
+cd C:\Users\Dell\Desktop\Ziyada\ziyada-v2
+git config --local user.name "Vaibhav Lodhia"
+git config --local user.email "VaibhavLodhia@users.noreply.github.com"
 git add .
-git commit -m "Initial ziyada-v2: Interview UI, chat, sidebars, calm theme"
-
-# Create an empty repo on GitHub named ziyada-v2, then:
-git branch -M main
-git remote add origin https://github.com/YOUR_USER/ziyada-v2.git
-git push -u origin main
+git -c commit.gpgsign=false commit -m "Rename to Ziayada and fix Vercel monorepo build"
+git push origin main
 ```
 
-Replace `YOUR_USER` with your GitHub username or org.
+## Vercel import
 
-## 2. Import on Vercel
+1. [vercel.com/new](https://vercel.com/new) → import **VaibhavLodhia/ziyada-v2** (GitHub repo name can stay `ziyada-v2`; product name is **Ziayada**).
+2. Project name: **ziayada-v2** → gives `ziayada-v2.vercel.app`.
+3. **Root Directory:** blank (use repo-root `vercel.json`).
+4. Deploy.
 
-1. Go to [vercel.com/new](https://vercel.com/new) and import the GitHub repo.
-2. **Root Directory:** `services/frontend` (required — monorepo layout).
-3. **Framework Preset:** Vite (auto-detected).
-4. **Build Command:** `npm run build`
-5. **Output Directory:** `dist`
-6. **Install Command:** `npm install`
+## Environment variables
 
-## 3. Environment variables (Vercel project settings)
+| Variable | Example |
+|----------|---------|
+| `VITE_API_BASE_URL` | `https://your-api-host.com` |
 
-| Variable | Example | Notes |
-|----------|---------|-------|
-| `VITE_API_BASE_URL` | `https://api.yourdomain.com` | Public URL of the FastAPI backend. No trailing slash. |
-
-Leave empty only for a static UI preview (login/chat will fail without a backend).
-
-After the backend is live, set `CORS_ORIGINS` on the backend to include your Vercel URL, e.g.:
+Backend `CORS_ORIGINS` must include:
 
 ```
-CORS_ORIGINS=https://ziyada-v2.vercel.app,https://your-custom-domain.com
+https://ziayada-v2.vercel.app
 ```
 
-Auth uses HTTP-only cookies (`credentials: include`), so the API must be on HTTPS and CORS must allow your Vercel origin.
+## CLI deploy
 
-## 4. Redeploy
-
-Vercel redeploys on every push to `main`. To deploy from CLI:
-
-```bash
-cd services/frontend
+```powershell
+cd C:\Users\Dell\Desktop\Ziyada\ziyada-v2
 npx vercel login
 npx vercel --prod
 ```
-
-Set `VITE_API_BASE_URL` in the Vercel dashboard before the first production deploy, or add it via CLI:
-
-```bash
-npx vercel env add VITE_API_BASE_URL production
-```
-
-## 5. Backend (not on Vercel)
-
-Use Docker Compose locally, or deploy `services/backend` + Postgres to Railway/Render:
-
-- Expose port 8001 (or 8000)
-- Set `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGINS`, voice keys, etc. from `services/backend/.env.example`
-- Point `VITE_API_BASE_URL` at that public API URL
-
-## Troubleshooting
-
-- **404 on refresh** — `vercel.json` rewrites all routes to `index.html` for React Router.
-- **Login 401 / CORS errors** — backend `CORS_ORIGINS` must list the exact Vercel URL (scheme + host, no path).
-- **Voice mic** — requires backend `/api/voice/token` and WebSocket; works only when API is reachable from the browser.

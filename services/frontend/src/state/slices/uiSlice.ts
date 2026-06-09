@@ -17,7 +17,7 @@ function applyTheme(theme: ThemeName): void {
   if (typeof document === 'undefined') return;
   document.documentElement.setAttribute('data-theme', theme);
   try {
-    localStorage.setItem('ziyada-theme', theme);
+    localStorage.setItem('ziayada-theme', theme);
   } catch {
     // ignore storage errors
   }
@@ -26,7 +26,7 @@ function applyTheme(theme: ThemeName): void {
 function getInitialTheme(): ThemeName {
   if (typeof window === 'undefined') return 'parchment';
   try {
-    const saved = localStorage.getItem('ziyada-theme');
+    const saved = localStorage.getItem('ziayada-theme');
     if (saved === 'parchment' || saved === 'obsidian') return saved;
   } catch {
     // ignore storage errors

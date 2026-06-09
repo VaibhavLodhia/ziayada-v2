@@ -25,7 +25,7 @@ export function Brand({ size = 'md', className }: BrandProps) {
       )}
       aria-label="Go to home"
     >
-      <span>Ziyada</span>
+      <span>Ziayada</span>
       <span className="h-1.5 w-1.5 rounded-full bg-seal" aria-hidden />
     </Link>
   );

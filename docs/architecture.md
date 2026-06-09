@@ -1,8 +1,8 @@
-# Ziyada V2 Architecture
+# Ziayada V2 Architecture
 
 ## Overview
 
-Ziyada V2 reuses the v1 backend unchanged and rebuilds the frontend in the Interview design language. The browser talks to the same FastAPI services: cookie JWT auth, SSE chat stream with LangGraph and tools, voice token minting for xAI Realtime, Apache AGE graph in Postgres, and admin endpoints.
+Ziayada V2 reuses the v1 backend unchanged and rebuilds the frontend in the Interview design language. The browser talks to the same FastAPI services: cookie JWT auth, SSE chat stream with LangGraph and tools, voice token minting for xAI Realtime, Apache AGE graph in Postgres, and admin endpoints.
 
 ## Backend (unchanged from v1)
 

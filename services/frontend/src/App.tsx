@@ -30,7 +30,7 @@ export function App() {
   const [booting, setBooting] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem('ziyada-theme') || 'parchment';
+    const saved = localStorage.getItem('ziayada-theme') || 'parchment';
     document.documentElement.setAttribute('data-theme', saved);
     void hydrate();
     const t = setTimeout(() => setBooting(false), 1000);

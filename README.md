@@ -1,13 +1,13 @@
-# Ziyada V2
+# Ziayada V2
 
 Private intelligence layer with the Interview design language.
 
-v2 introduces the Interview design language. Backend, auth, voice, and contracts are unchanged from v1.
+Ziayada v2 introduces the Interview design language. Backend, auth, voice, and contracts are unchanged from v1.
 
 ## Layout
 
 ```
-ziyada-v2/
+ziayada-v2/  (folder may still be `ziyada-v2` locally)
 ├── contracts/          # API and stream event schemas (from v1)
 ├── deploy/             # Deployment configs (from v1)
 ├── docs/               # Architecture and design notes
@@ -92,4 +92,4 @@ Frontend only. See **[docs/deploy-vercel.md](docs/deploy-vercel.md)** for GitHub
 Quick Vercel settings:
 
 - **Root directory:** `services/frontend`
-- **Env:** `VITE_API_BASE_URL=https://your-api-host` (backend must allow your Vercel origin in `CORS_ORIGINS`)
+- **Env:** `VITE_API_BASE_URL=https://your-api-host` (backend must allow `https://ziayada-v2.vercel.app` in `CORS_ORIGINS`)

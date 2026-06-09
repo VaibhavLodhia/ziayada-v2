@@ -140,7 +140,7 @@ export function Field({
               className={cn(
                 'relative flex h-9 w-9 items-center justify-center rounded-full text-ink3 transition-colors hover:bg-ground2 hover:text-seal disabled:cursor-not-allowed disabled:opacity-40',
                 liveVoice
-                  ? 'animate-[ziyada-pulse_1.4s_ease-in-out_infinite] bg-seal text-ground hover:bg-seal'
+                  ? 'animate-[ziayada-pulse_1.4s_ease-in-out_infinite] bg-seal text-ground hover:bg-seal'
                   : '',
               )}
               onClick={() => voice.toggle()}
@@ -180,7 +180,7 @@ export function Field({
             onClick={() => voice.stop()}
             className="inline-flex items-center gap-1.5 rounded-pill border border-seal bg-sealGlow px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide-2 text-seal transition-colors hover:bg-seal hover:text-ground"
           >
-            <span className="h-1.5 w-1.5 animate-[ziyada-pulse_1.4s_ease-in-out_infinite] rounded-full bg-seal" />
+            <span className="h-1.5 w-1.5 animate-[ziayada-pulse_1.4s_ease-in-out_infinite] rounded-full bg-seal" />
             Stop listening
           </button>
           {voice.draftTranscript ? (

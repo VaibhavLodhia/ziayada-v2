@@ -23,7 +23,7 @@ export const useAppStore = create<AppState>()(
       ...createChatSlice(...args),
     }),
     {
-      name: 'ziyada-store',
+      name: 'ziayada-store',
       partialize: (state): PersistedState => ({
         theme: state.theme,
         chatSessionId: state.chatSessionId,

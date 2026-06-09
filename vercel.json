@@ -1,0 +1,11 @@
+{
+  "installCommand": "npm install --prefix services/frontend",
+  "buildCommand": "npm run build --prefix services/frontend",
+  "outputDirectory": "services/frontend/dist",
+  "rewrites": [
+    {
+      "source": "/((?!assets/|pcm-processor-worklet\\.js).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

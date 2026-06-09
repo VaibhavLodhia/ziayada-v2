@@ -93,7 +93,7 @@ export function InsightPanel({ open }: InsightPanelProps) {
                 Signal readings
               </span>
               <span className="inline-flex items-center gap-1.5 font-sans text-[10px] font-medium text-seal">
-                <span className="h-1.5 w-1.5 animate-[ziyada-pulse_1.4s_ease-in-out_infinite] rounded-full bg-seal" />
+                <span className="h-1.5 w-1.5 animate-[ziayada-pulse_1.4s_ease-in-out_infinite] rounded-full bg-seal" />
                 Live
               </span>
             </div>
