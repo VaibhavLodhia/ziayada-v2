@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: apache/age:release_PG16_1.6.0
+    container_name: ziyada-v2-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ziyada
+      POSTGRES_USER: ziyada
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in your root .env}
+    volumes:
+      - ziyada_v2_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ziyada -d ziyada"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./services/backend
+      dockerfile: Dockerfile
+    container_name: ziyada-v2-backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8001:8000"
+    env_file:
+      - services/backend/.env
+    environment:
+      APP_ENV: docker
+      CORS_ORIGINS: http://localhost:5174
+    volumes:
+      - ./services/backend/app:/app/app
+      - ./services/backend/seed:/app/seed
+      - ziyada_v2_backend_data:/app/.data
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    image: node:20-slim
+    container_name: ziyada-v2-frontend
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port 5173"
+    ports:
+      - "5174:5173"
+    environment:
+      BACKEND_URL: http://backend:8000
+    volumes:
+      - ./services/frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  ziyada_v2_backend_data:
+  ziyada_v2_postgres_data:

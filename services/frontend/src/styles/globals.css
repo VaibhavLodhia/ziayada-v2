@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300;9..144,400;9..144,500&family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+:root[data-theme='parchment'] {
+  --color-ground: #f2f6f4;
+  --color-ground2: #ecf1ee;
+  --color-elevated: #ffffff;
+  --color-rule: #dde4e0;
+  --color-ruleSoft: #e8edea;
+  --color-ink: #14211d;
+  --color-ink2: #5c6a65;
+  --color-ink3: #8fa09a;
+  --color-inkFaint: #b8c4bf;
+  --color-seal: #0f4c46;
+  --color-sealGlow: #e0edeb;
+  --color-st-respond: #2f6b30;
+  --color-st-narrow: #0f4c46;
+  --color-st-flag: #8b6a1f;
+  --color-st-defer: #4a5a6b;
+  --color-st-explore: #6b3f94;
+  --color-st-respond-bg: #dfeddb;
+  --color-st-narrow-bg: #e0edeb;
+  --color-st-flag-bg: #f5ebd0;
+  --color-st-defer-bg: #e5e9ee;
+  --color-st-explore-bg: #ece0f3;
+}
+
+[data-theme='obsidian'] {
+  --color-ground: #0e1513;
+  --color-ground2: #131c19;
+  --color-elevated: #1a2521;
+  --color-rule: #243029;
+  --color-ruleSoft: #1e2925;
+  --color-ink: #ecf1ee;
+  --color-ink2: #8fa09a;
+  --color-ink3: #6f8079;
+  --color-inkFaint: #4a5854;
+  --color-seal: #6bcfb8;
+  --color-sealGlow: #143a35;
+  --color-st-respond: #80c480;
+  --color-st-narrow: #6bcfb8;
+  --color-st-flag: #d9b45a;
+  --color-st-defer: #94a6bc;
+  --color-st-explore: #b8a5d9;
+  --color-st-respond-bg: #143a1a;
+  --color-st-narrow-bg: #143a35;
+  --color-st-flag-bg: #3a2e14;
+  --color-st-defer-bg: #1e2a36;
+  --color-st-explore-bg: #2a1e36;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-ground);
+  color: var(--color-ink);
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: 'opsz' 36, 'SOFT' 50;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'kern', 'liga', 'calt', 'onum';
+  transition:
+    background 600ms cubic-bezier(0.2, 0, 0, 1),
+    color 600ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+::selection {
+  background: var(--color-seal);
+  color: var(--color-ground);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+.ziyada-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--color-ground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 800ms ease;
+}
+
+.ziyada-loading.gone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ziyada-loading-mark {
+  font-size: 64px;
+  font-style: italic;
+  letter-spacing: -0.025em;
+  font-variation-settings: 'opsz' 144, 'SOFT' 80;
+  color: var(--color-ink);
+  animation: ziyada-ink-in 1400ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.ziyada-loading-mark .stop {
+  color: var(--color-seal);
+  font-style: normal;
+}
+
+@keyframes ziyada-ink-in {
+  from {
+    opacity: 0;
+    letter-spacing: 0.05em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: -0.025em;
+  }
+}
+
+@keyframes ziyada-settle {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ziyada-lift {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes ziyada-stamp {
+  0% {
+    transform: scale(2.2);
+    opacity: 0;
+    letter-spacing: 0.18em;
+  }
+  60% {
+    transform: scale(1);
+    opacity: 1;
+    letter-spacing: 0.08em;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    letter-spacing: 0.12em;
+  }
+}
+
+@keyframes ziyada-glyph {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  40% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 18px var(--color-seal));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px var(--color-sealGlow));
+  }
+}
+
+@keyframes ziyada-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}

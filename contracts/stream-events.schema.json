@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "$defs": {
+    "DoneEvent": {
+      "additionalProperties": false,
+      "description": "Terminal event \u2014 always the last frame.",
+      "properties": {
+        "type": {
+          "const": "done",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "DoneEvent",
+      "type": "object"
+    },
+    "ErrorEvent": {
+      "additionalProperties": false,
+      "description": "A fatal stream error; the stream still terminates with `done`.",
+      "properties": {
+        "type": {
+          "const": "error",
+          "title": "Type",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "message"
+      ],
+      "title": "ErrorEvent",
+      "type": "object"
+    },
+    "SessionEvent": {
+      "additionalProperties": false,
+      "description": "First event \u2014 carries the (possibly newly created) session id.",
+      "properties": {
+        "type": {
+          "const": "session",
+          "title": "Type",
+          "type": "string"
+        },
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "session_id"
+      ],
+      "title": "SessionEvent",
+      "type": "object"
+    },
+    "TokenEvent": {
+      "additionalProperties": false,
+      "description": "An assistant token chunk.",
+      "properties": {
+        "type": {
+          "const": "token",
+          "title": "Type",
+          "type": "string"
+        },
+        "delta": {
+          "title": "Delta",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "delta"
+      ],
+      "title": "TokenEvent",
+      "type": "object"
+    },
+    "ToolEvent": {
+      "additionalProperties": false,
+      "description": "A tool invocation has started.",
+      "properties": {
+        "type": {
+          "const": "tool",
+          "title": "Type",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "args": {
+          "additionalProperties": true,
+          "title": "Args",
+          "type": "object"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "title": "ToolEvent",
+      "type": "object"
+    },
+    "ToolResultEvent": {
+      "additionalProperties": false,
+      "description": "A tool invocation has finished.",
+      "properties": {
+        "type": {
+          "const": "tool_result",
+          "title": "Type",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "result": {
+          "title": "Result",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "name",
+        "result"
+      ],
+      "title": "ToolResultEvent",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "done": "#/$defs/DoneEvent",
+      "error": "#/$defs/ErrorEvent",
+      "session": "#/$defs/SessionEvent",
+      "token": "#/$defs/TokenEvent",
+      "tool": "#/$defs/ToolEvent",
+      "tool_result": "#/$defs/ToolResultEvent"
+    },
+    "propertyName": "type"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/SessionEvent"
+    },
+    {
+      "$ref": "#/$defs/TokenEvent"
+    },
+    {
+      "$ref": "#/$defs/ToolEvent"
+    },
+    {
+      "$ref": "#/$defs/ToolResultEvent"
+    },
+    {
+      "$ref": "#/$defs/ErrorEvent"
+    },
+    {
+      "$ref": "#/$defs/DoneEvent"
+    }
+  ]
+}
