@@ -1,6 +1,6 @@
 import type { StreamEvent } from './stream-events.gen';
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? '';
+const BASE = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '');
 
 export class ApiError extends Error {
   status: number;
