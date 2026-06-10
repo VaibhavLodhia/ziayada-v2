@@ -10,6 +10,7 @@ export const tokens = {
     inkFaint: '#6B6457',
     seal: '#143753',
     sealGlow: '#E8E4D8',
+    dimScrim: '#B8AC8E',
     cardBg: '#FFFFFF',
     cardEdge: '#E8E1CC',
     cardInk: '#0A0908',
