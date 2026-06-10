@@ -20,6 +20,9 @@ type FieldProps = {
   inputClassName?: string;
   id?: string;
   name?: string;
+  streaming?: boolean;
+  onStop?: () => void;
+  cardMode?: boolean;
 };
 
 export function Field({
@@ -39,6 +42,9 @@ export function Field({
   inputClassName,
   id,
   name,
+  streaming = false,
+  onStop,
+  cardMode = false,
 }: FieldProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const chatMode = voiceEnabled || multiline;
@@ -69,7 +75,10 @@ export function Field({
   const micLabel = voice.error ?? (liveVoice ? 'Stop recording' : 'Record voice');
 
   const inputClass = cn(
-    'flex-1 bg-transparent py-2 text-left font-display text-[clamp(17px,1.6vw,19px)] leading-[1.6] text-ink placeholder:text-inkFaint focus:outline-none caret-seal',
+    'flex-1 bg-transparent py-2 text-left font-display text-[clamp(17px,1.6vw,19px)] leading-[1.6] focus:outline-none',
+    cardMode
+      ? 'text-[var(--color-cardInk)] placeholder:text-[var(--color-cardInk3)] caret-[var(--color-cardInk)]'
+      : 'text-ink placeholder:text-inkFaint caret-seal',
     multiline ? 'max-h-[200px] min-h-[30px] resize-none' : 'min-h-[30px]',
     inputClassName,
   );
@@ -77,7 +86,10 @@ export function Field({
   return (
     <div
       className={cn(
-        'w-full border-b border-rule px-1.5 pb-3 pt-2 transition-colors focus-within:border-seal',
+        'w-full border-b px-1.5 pb-3 pt-2 transition-colors',
+        cardMode
+          ? 'border-[var(--color-cardEdge)] focus-within:border-[var(--color-cardInk)]'
+          : 'border-rule focus-within:border-seal',
         chatMode ? 'max-w-[640px]' : '',
         className,
       )}
@@ -96,7 +108,7 @@ export function Field({
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                if (!sendDisabled) onSubmit();
+                if (!sendDisabled && !streaming) onSubmit();
               }
             }}
             placeholder={placeholder}
@@ -114,7 +126,7 @@ export function Field({
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
-                if (!sendDisabled) onSubmit();
+                if (!sendDisabled && !streaming) onSubmit();
               }
             }}
             placeholder={placeholder}
@@ -138,7 +150,10 @@ export function Field({
               type="button"
               disabled={disabled && !liveVoice}
               className={cn(
-                'relative flex h-9 w-9 items-center justify-center rounded-full text-ink3 transition-colors hover:bg-ground2 hover:text-seal disabled:cursor-not-allowed disabled:opacity-40',
+                'relative flex h-9 w-9 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40',
+                cardMode
+                  ? 'text-[var(--color-cardInk3)] hover:bg-[var(--color-cardEdge)] hover:text-[var(--color-cardInk)]'
+                  : 'text-ink3 hover:bg-ground2 hover:text-seal',
                 liveVoice
                   ? 'animate-[ziayada-pulse_1.4s_ease-in-out_infinite] bg-seal text-ground hover:bg-seal'
                   : '',
@@ -158,18 +173,45 @@ export function Field({
         ) : null}
 
         {chatMode ? (
-          <button
-            type="button"
-            disabled={sendDisabled || liveVoice}
-            onClick={onSubmit}
-            className={cn(
-              'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-inkFaint transition-all hover:bg-ground2 hover:text-seal disabled:cursor-not-allowed disabled:opacity-40',
-              !sendDisabled && !liveVoice ? 'bg-ink text-ground hover:bg-seal' : '',
-            )}
-            aria-label="Send"
-          >
-            <ArrowRight className="h-[18px] w-[18px]" />
-          </button>
+          streaming ? (
+            <button
+              type="button"
+              onClick={onStop}
+              aria-label="Stop generating"
+              className={cn(
+                'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors hover:text-white',
+                cardMode
+                  ? 'border-[var(--color-cardInk)] hover:bg-[var(--color-cardInk)]'
+                  : 'border-ink hover:bg-ink',
+              )}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <rect x="1" y="1" width="10" height="10" rx="1.5" />
+              </svg>
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={sendDisabled || liveVoice}
+              onClick={onSubmit}
+              aria-label="Send"
+              className={cn(
+                'flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40',
+                value.trim()
+                  ? 'bg-[var(--color-cardInk)] text-white'
+                  : cardMode
+                    ? 'text-[var(--color-cardInk3)]'
+                    : 'text-inkFaint hover:bg-ground2 hover:text-seal',
+                !cardMode && value.trim() ? 'bg-ink text-ground hover:bg-seal' : '',
+              )}
+            >
+              <ArrowRight
+                size={16}
+                strokeWidth={2.25}
+                className={value.trim() ? 'text-white' : undefined}
+              />
+            </button>
+          )
         ) : null}
       </div>
 

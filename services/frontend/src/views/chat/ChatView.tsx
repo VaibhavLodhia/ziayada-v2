@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Field } from '@/components/primitives/Field';
 import { chatStream } from '@/lib/api';
@@ -12,7 +12,7 @@ function countUserMessages(messages: { role: string }[]): number {
 
 export function ChatView() {
   const messages = useAppStore((s) => s.messages);
-  const chatPending = useAppStore((s) => s.chatPending);
+  const streaming = useAppStore((s) => s.streaming);
   const chatError = useAppStore((s) => s.chatError);
   const chatSessionId = useAppStore((s) => s.chatSessionId);
   const appendUserMessage = useAppStore((s) => s.appendUserMessage);
@@ -24,11 +24,23 @@ export function ChatView() {
   const setChatSessionId = useAppStore((s) => s.setChatSessionId);
   const setChatPending = useAppStore((s) => s.setChatPending);
   const setChatError = useAppStore((s) => s.setChatError);
+  const setStreaming = useAppStore((s) => s.setStreaming);
+  const setAbortController = useAppStore((s) => s.setAbortController);
+  const stopStreaming = useAppStore((s) => s.stopStreaming);
   const resetChat = useAppStore((s) => s.resetChat);
 
-  const abortRef = useRef<AbortController | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const stickToBottomRef = useRef(true);
 
-  useEffect(() => () => abortRef.current?.abort(), []);
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    if (messages.at(-1)?.role === 'user' || streaming) {
+      stickToBottomRef.current = true;
+    }
+    if (!stickToBottomRef.current) return;
+    el.scrollTop = el.scrollHeight;
+  }, [messages, streaming]);
 
   const applyMockAssistant = useCallback(
     async (userText: string, userMessageCount: number) => {
@@ -46,9 +58,7 @@ export function ChatView() {
   const handleSend = useCallback(
     async (text: string) => {
       const trimmed = text.trim();
-      if (!trimmed) return;
-
-      abortRef.current?.abort();
+      if (!trimmed || streaming) return;
 
       const stateBefore = useAppStore.getState();
       const priorMessages = stateBefore.messages
@@ -61,13 +71,14 @@ export function ChatView() {
 
       const userMessageCount = countUserMessages(stateBefore.messages) + 1;
 
+      const controller = new AbortController();
+      setAbortController(controller);
+      setStreaming(true);
       appendUserMessage(trimmed);
       setChatError(null);
       setChatPending(true);
       startAssistantStream();
 
-      const controller = new AbortController();
-      abortRef.current = controller;
       let gotTokens = false;
 
       try {
@@ -102,7 +113,7 @@ export function ChatView() {
         );
 
         const last = useAppStore.getState().messages.at(-1);
-        if (!gotTokens || (last?.role === 'assistant' && !last.content.trim())) {
+        if (!controller.signal.aborted && (!gotTokens || (last?.role === 'assistant' && !last.content.trim()))) {
           await applyMockAssistant(trimmed, userMessageCount);
         }
       } catch (e) {
@@ -110,7 +121,10 @@ export function ChatView() {
         setChatError(e instanceof Error ? e.message : String(e));
         await applyMockAssistant(trimmed, userMessageCount);
       } finally {
-        if (abortRef.current === controller) abortRef.current = null;
+        if (useAppStore.getState().abortController === controller) {
+          setAbortController(null);
+        }
+        setStreaming(false);
         setChatPending(false);
       }
     },
@@ -119,22 +133,31 @@ export function ChatView() {
       appendToolCallToCurrent,
       appendUserMessage,
       applyMockAssistant,
+      setAbortController,
       setChatError,
       setChatPending,
       setChatSessionId,
+      setStreaming,
       setToolResultOnCurrent,
       startAssistantStream,
+      streaming,
     ],
   );
+
+  const handleStop = useCallback(() => {
+    stopStreaming();
+  }, [stopStreaming]);
 
   const [input, setInput] = useState('');
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-3.5rem)] w-full max-w-[760px] flex-col">
-      <div className="flex items-center justify-between border-b border-ruleSoft px-6 py-3">
+    <div className="relative flex min-h-[calc(100vh-56px)] flex-1 flex-col items-center justify-start px-6 py-8">
+      <div className="chat-dim-scrim" aria-hidden="true" />
+
+      <div className="relative z-10 mb-6 flex w-full max-w-[760px] items-baseline justify-between">
         <div>
-          <h1 className="font-display text-lg italic text-ink">Chat</h1>
-          <p className="font-mono text-[10px] uppercase tracking-wide-3 text-ink3">
+          <h1 className="font-display text-2xl italic text-ink">Chat</h1>
+          <p className="mt-1 font-mono text-[10px] uppercase tracking-wide-3 text-ink2">
             Private layer
             {chatSessionId ? (
               <span className="text-seal"> · session {chatSessionId.slice(0, 8)}</span>
@@ -144,18 +167,15 @@ export function ChatView() {
         <div className="flex items-center gap-2">
           <Link
             to="/decide"
-            className="rounded-pill border border-seal px-3 py-1.5 font-mono text-[10px] uppercase tracking-wide-2 text-seal hover:bg-sealGlow"
+            className="rounded-pill border border-seal px-4 py-2 font-mono text-[10px] uppercase tracking-wide-2 text-seal transition-colors hover:bg-seal hover:text-ground"
           >
             Record a decision
           </Link>
           {messages.length > 0 ? (
             <button
               type="button"
-              onClick={() => {
-                abortRef.current?.abort();
-                resetChat();
-              }}
-              className="rounded-pill border border-rule px-3 py-1.5 font-mono text-[10px] uppercase tracking-wide-2 text-ink3 hover:bg-ground2"
+              onClick={() => resetChat()}
+              className="rounded-pill border border-rule px-3 py-2 font-mono text-[10px] uppercase tracking-wide-2 text-ink2 transition-colors hover:bg-ground2 hover:text-ink"
             >
               New chat
             </button>
@@ -163,34 +183,62 @@ export function ChatView() {
         </div>
       </div>
 
-      <ChatMessages messages={messages} pending={chatPending} />
+      <div
+        className="chat-card relative z-10 flex w-full max-w-[760px] flex-col"
+        style={{ minHeight: '60vh', maxHeight: 'calc(100vh - 200px)' }}
+      >
+        <div
+          ref={scrollRef}
+          onScroll={() => {
+            const el = scrollRef.current;
+            if (!el) return;
+            const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+            stickToBottomRef.current = distanceFromBottom < 96;
+          }}
+          className="flex-1 overflow-y-auto px-8 py-10"
+        >
+          {messages.length === 0 ? (
+            <div className="flex h-full flex-col items-center justify-center text-center">
+              <p className="font-display text-xl italic text-[var(--color-cardInk)]">
+                Private by design. Your conversation stays in your ledger.
+              </p>
+              <p className="mt-3 font-mono text-[10px] uppercase tracking-wide-3 text-[var(--color-cardInk3)]">
+                Ask anything. Use Record a decision when you want the structured interview.
+              </p>
+            </div>
+          ) : (
+            <ChatMessages messages={messages} streaming={streaming} />
+          )}
+        </div>
 
-      {chatError ? (
-        <p className="px-6 pb-2 text-center font-display italic text-seal">{chatError}</p>
-      ) : null}
+        {chatError ? (
+          <p className="px-6 pb-2 text-center font-display italic text-seal">{chatError}</p>
+        ) : null}
 
-      <div className="border-t border-ruleSoft px-6 py-4">
-        <Field
-          value={input}
-          onChange={setInput}
-          onSubmit={() => {
-            void handleSend(input);
-            setInput('');
-          }}
-          onVoiceSubmit={(text) => {
-            setInput('');
-            void handleSend(text);
-          }}
-          onListeningChange={(listening) => {
-            if (!listening) return;
-            setChatPending(false);
-            abortRef.current?.abort();
-            abortRef.current = null;
-          }}
-          placeholder="Describe what you are working through..."
-          voiceEnabled
-          disabled={chatPending}
-        />
+        <div className="border-t border-[var(--color-cardEdge)] px-6 py-4">
+          <Field
+            value={input}
+            onChange={setInput}
+            onSubmit={() => {
+              void handleSend(input);
+              setInput('');
+            }}
+            onVoiceSubmit={(text) => {
+              setInput('');
+              void handleSend(text);
+            }}
+            onListeningChange={(listening) => {
+              if (!listening) return;
+              stopStreaming();
+            }}
+            placeholder="Describe what you are working through..."
+            streaming={streaming}
+            onStop={handleStop}
+            voiceEnabled
+            multiline
+            cardMode
+          />
+        </div>
       </div>
     </div>
   );

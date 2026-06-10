@@ -20,6 +20,8 @@ export type ChatSlice = {
   messages: ChatMessageWithTools[];
   chatPending: boolean;
   chatError: string | null;
+  streaming: boolean;
+  abortController: AbortController | null;
   appendUserMessage: (content: string) => void;
   startAssistantStream: () => void;
   appendAssistantDelta: (delta: string) => void;
@@ -29,14 +31,19 @@ export type ChatSlice = {
   setChatSessionId: (id: string) => void;
   setChatPending: (pending: boolean) => void;
   setChatError: (error: string | null) => void;
+  setStreaming: (v: boolean) => void;
+  setAbortController: (c: AbortController | null) => void;
+  stopStreaming: () => void;
   resetChat: () => void;
 };
 
-export const createChatSlice: StateCreator<ChatSlice> = (set) => ({
+export const createChatSlice: StateCreator<ChatSlice> = (set, get) => ({
   chatSessionId: null,
   messages: [],
   chatPending: false,
   chatError: null,
+  streaming: false,
+  abortController: null,
   appendUserMessage: (content) =>
     set((s) => ({ messages: [...s.messages, { role: 'user', content }] })),
   startAssistantStream: () =>
@@ -86,6 +93,23 @@ export const createChatSlice: StateCreator<ChatSlice> = (set) => ({
   setChatSessionId: (id) => set({ chatSessionId: id }),
   setChatPending: (pending) => set({ chatPending: pending }),
   setChatError: (error) => set({ chatError: error }),
-  resetChat: () =>
-    set({ chatSessionId: null, messages: [], chatPending: false, chatError: null }),
+  setStreaming: (v) => set({ streaming: v }),
+  setAbortController: (c) => set({ abortController: c }),
+  stopStreaming: () => {
+    const ctrl = get().abortController;
+    if (ctrl) ctrl.abort();
+    set({ streaming: false, abortController: null, chatPending: false });
+  },
+  resetChat: () => {
+    const ctrl = get().abortController;
+    if (ctrl) ctrl.abort();
+    set({
+      chatSessionId: null,
+      messages: [],
+      chatPending: false,
+      chatError: null,
+      streaming: false,
+      abortController: null,
+    });
+  },
 });

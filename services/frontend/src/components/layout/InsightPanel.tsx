@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/classNames';
 import type { StateName } from '@/lib/tokens';
+import { PulseDot } from '@/components/primitives/PulseDot';
 import { StatePill } from '@/components/primitives/StatePill';
 import { useAppStore } from '@/state/store';
 import { SIGNAL_READINGS } from './insightData';
@@ -37,6 +38,7 @@ function SignalRow({ label, value, color }: { label: string; value: number; colo
 
 export function InsightPanel({ open }: InsightPanelProps) {
   const ledger = useAppStore((s) => s.ledger);
+  const streaming = useAppStore((s) => s.streaming);
   const openReading = useAppStore((s) => s.openReading);
   const setRightPanelOpen = useAppStore((s) => s.setRightPanelOpen);
   const recent = ledger.slice(0, 3);
@@ -107,15 +109,21 @@ export function InsightPanel({ open }: InsightPanelProps) {
           <section className="rounded-xl border border-rule bg-sealGlow/40 p-4">
             <span className="font-mono text-[10px] uppercase tracking-wide-2 text-ink3">Mediation</span>
             <div className="mt-3 flex gap-2.5">
-              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-seal shadow-[0_0_8px_var(--color-seal)]" />
-              <div>
-                <p className="font-mono text-[10px] font-medium uppercase tracking-wide-1 text-seal">
-                  Narrow · Active
-                </p>
-                <p className="mt-1 font-sans text-xs leading-relaxed text-ink2">
-                  High-stakes context. Narrowing to structured due-diligence before commitment.
-                </p>
-              </div>
+              {streaming ? (
+                <PulseDot size="sm" label="Mediating" />
+              ) : (
+                <>
+                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-seal shadow-[0_0_8px_var(--color-seal)]" />
+                  <div>
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-wide-1 text-seal">
+                      Narrow · Active
+                    </p>
+                    <p className="mt-1 font-sans text-xs leading-relaxed text-ink2">
+                      High-stakes context. Narrowing to structured due-diligence before commitment.
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           </section>
         </div>
