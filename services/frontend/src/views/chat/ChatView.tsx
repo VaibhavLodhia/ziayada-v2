@@ -31,6 +31,7 @@ export function ChatView() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const stickToBottomRef = useRef(true);
+  const started = messages.length > 0;
 
   useLayoutEffect(() => {
     const el = scrollRef.current;
@@ -150,95 +151,116 @@ export function ChatView() {
 
   const [input, setInput] = useState('');
 
-  return (
-    <div className="relative flex min-h-[calc(100vh-56px)] flex-1 flex-col items-center justify-start px-6 py-8">
-      <div className="chat-dim-scrim" aria-hidden="true" />
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    stickToBottomRef.current = distanceFromBottom < 96;
+  };
 
-      <div className="relative z-10 mb-6 flex w-full max-w-[760px] items-baseline justify-between">
-        <div>
-          <h1 className="font-display text-2xl italic text-ink">Chat</h1>
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-wide-3 text-ink2">
-            Private layer
-            {chatSessionId ? (
-              <span className="text-seal"> · session {chatSessionId.slice(0, 8)}</span>
-            ) : null}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            to="/decide"
-            className="rounded-pill border border-seal px-4 py-2 font-mono text-[10px] uppercase tracking-wide-2 text-seal transition-colors hover:bg-seal hover:text-ground"
-          >
-            Record a decision
-          </Link>
-          {messages.length > 0 ? (
-            <button
-              type="button"
-              onClick={() => resetChat()}
-              className="rounded-pill border border-rule px-3 py-2 font-mono text-[10px] uppercase tracking-wide-2 text-ink2 transition-colors hover:bg-ground2 hover:text-ink"
-            >
-              New chat
-            </button>
+  const chatField = (
+    <Field
+      value={input}
+      onChange={setInput}
+      onSubmit={() => {
+        void handleSend(input);
+        setInput('');
+      }}
+      onVoiceSubmit={(text) => {
+        setInput('');
+        void handleSend(text);
+      }}
+      onListeningChange={(listening) => {
+        if (!listening) return;
+        stopStreaming();
+      }}
+      placeholder="Describe what you are working through..."
+      streaming={streaming}
+      onStop={handleStop}
+      voiceEnabled
+      multiline
+      cardMode={!started}
+    />
+  );
+
+  const pageHeader = (
+    <div className="flex w-full max-w-[760px] items-baseline justify-between">
+      <div>
+        <h1 className="font-display text-2xl italic text-ink">Chat</h1>
+        <p className="mt-1 font-mono text-[10px] uppercase tracking-wide-3 text-ink">
+          Private layer
+          {chatSessionId ? (
+            <span className="text-seal"> · session {chatSessionId.slice(0, 8)}</span>
           ) : null}
-        </div>
+        </p>
       </div>
-
-      <div
-        className="chat-card relative z-10 flex w-full max-w-[760px] flex-col"
-        style={{ minHeight: '60vh', maxHeight: 'calc(100vh - 200px)' }}
-      >
-        <div
-          ref={scrollRef}
-          onScroll={() => {
-            const el = scrollRef.current;
-            if (!el) return;
-            const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-            stickToBottomRef.current = distanceFromBottom < 96;
-          }}
-          className="flex-1 overflow-y-auto px-8 py-10"
+      <div className="flex items-center gap-2">
+        <Link
+          to="/decide"
+          className="rounded-pill border border-seal px-4 py-2 font-mono text-[10px] uppercase tracking-wide-2 text-seal transition-colors hover:bg-seal hover:text-ground"
         >
-          {messages.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center text-center">
-              <p className="font-display text-xl italic text-[var(--color-cardInk)]">
+          Record a decision
+        </Link>
+        {started ? (
+          <button
+            type="button"
+            onClick={() => resetChat()}
+            className="rounded-pill border border-rule px-3 py-2 font-mono text-[10px] uppercase tracking-wide-2 text-ink2 transition-colors hover:bg-ground2 hover:text-ink"
+          >
+            New chat
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+
+  if (!started) {
+    return (
+      <div className="relative flex min-h-[calc(100vh-56px)] flex-1 flex-col items-center bg-ground px-6 py-8">
+        <div className="chat-dim-scrim" aria-hidden="true" />
+
+        <div className="relative z-10 mb-6 w-full max-w-[760px]">{pageHeader}</div>
+
+        <div className="relative z-10 flex w-full max-w-[760px] flex-1 flex-col justify-center pb-8">
+          <div className="chat-card relative flex w-full flex-col">
+            <div className="px-6 py-8 text-center">
+              <p className="font-display text-lg italic text-[var(--color-cardInk)]">
                 Private by design. Your conversation stays in your ledger.
               </p>
-              <p className="mt-3 font-mono text-[10px] uppercase tracking-wide-3 text-[var(--color-cardInk3)]">
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-wide-3 text-[var(--color-cardInk2)]">
                 Ask anything. Use Record a decision when you want the structured interview.
               </p>
             </div>
-          ) : (
-            <ChatMessages messages={messages} streaming={streaming} />
-          )}
+
+            {chatError ? (
+              <p className="px-6 pb-2 text-center font-display italic text-seal">{chatError}</p>
+            ) : null}
+
+            <div className="border-t border-[var(--color-cardEdge)] px-5 py-3">{chatField}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-[calc(100vh-56px)] flex-1 flex-col bg-ground">
+      <div className="shrink-0 px-6 pb-4 pt-8">{pageHeader}</div>
+
+      <div className="mx-auto flex min-h-0 w-full max-w-[760px] flex-1 flex-col px-6">
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="min-h-0 flex-1 overflow-y-auto py-4"
+        >
+          <ChatMessages messages={messages} streaming={streaming} inCard={false} />
         </div>
 
         {chatError ? (
-          <p className="px-6 pb-2 text-center font-display italic text-seal">{chatError}</p>
+          <p className="shrink-0 pb-2 text-center font-display italic text-seal">{chatError}</p>
         ) : null}
 
-        <div className="border-t border-[var(--color-cardEdge)] px-6 py-4">
-          <Field
-            value={input}
-            onChange={setInput}
-            onSubmit={() => {
-              void handleSend(input);
-              setInput('');
-            }}
-            onVoiceSubmit={(text) => {
-              setInput('');
-              void handleSend(text);
-            }}
-            onListeningChange={(listening) => {
-              if (!listening) return;
-              stopStreaming();
-            }}
-            placeholder="Describe what you are working through..."
-            streaming={streaming}
-            onStop={handleStop}
-            voiceEnabled
-            multiline
-            cardMode
-          />
-        </div>
+        <div className="shrink-0 border-t border-rule py-4">{chatField}</div>
       </div>
     </div>
   );

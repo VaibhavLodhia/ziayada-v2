@@ -1,7 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300;9..144,400;9..144,500&family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300;9..144,400;9..144,500&family=Geist+Mono:wght@400;500&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Fraunces', Georgia, serif;
+    font-variation-settings: 'opsz' 36, 'SOFT' 50;
+  }
+}
 
 :root,
 :root[data-theme='parchment'] {
@@ -11,27 +18,29 @@
   --color-rule: #ddd3bd;
   --color-ruleSoft: #e8e1cc;
   --color-ink: #0a0908;
-  --color-ink2: #1f1c18;
-  --color-ink3: #4a453c;
-  --color-inkFaint: #7a7264;
+  --color-ink2: #141210;
+  --color-ink3: #3d3830;
+  --color-inkFaint: #6b6457;
   --color-seal: #143753;
   --color-sealGlow: #e8e4d8;
-  --color-dimScrim: #c9bfa3;
   --color-cardBg: #ffffff;
   --color-cardEdge: #e8e1cc;
-  --color-emerald: #10b981;
   --color-cardInk: #0a0908;
-  --color-cardInk2: #2d2b27;
-  --color-cardInk3: #524c42;
+  --color-cardInk2: #1f1c18;
+  --color-cardInk3: #4a453c;
+  --color-cardSendBg: #0a0908;
+  --color-cardSendFg: #ffffff;
+  --color-cardFocus: #0a0908;
+  --color-emerald: #10b981;
   --color-st-respond: #2f6b30;
   --color-st-narrow: #0f4c46;
   --color-st-flag: #8b6a1f;
   --color-st-defer: #4a5a6b;
   --color-st-explore: #6b3f94;
   --color-st-respond-bg: #dfeddb;
-  --color-st-narrow-bg: #e0edeb;
+  --color-st-narrow-bg: #e8e4d8;
   --color-st-flag-bg: #f5ebd0;
-  --color-st-defer-bg: #e5e9ee;
+  --color-st-defer-bg: #e8e1cc;
   --color-st-explore-bg: #ece0f3;
 }
 
@@ -41,19 +50,21 @@
   --color-elevated: #1a2521;
   --color-rule: #243029;
   --color-ruleSoft: #1e2925;
-  --color-ink: #f5f8f6;
-  --color-ink2: #c8d4cf;
-  --color-ink3: #9fb3ab;
-  --color-inkFaint: #6f8079;
+  --color-ink: #fafcf9;
+  --color-ink2: #dce8e4;
+  --color-ink3: #b4c8c0;
+  --color-inkFaint: #8fa09a;
   --color-seal: #6bcfb8;
   --color-sealGlow: #143a35;
-  --color-dimScrim: #1a1815;
-  --color-cardBg: #ffffff;
-  --color-cardEdge: #d4cfc0;
+  --color-cardBg: #1a2521;
+  --color-cardEdge: #2f3f38;
+  --color-cardInk: #f5f8f6;
+  --color-cardInk2: #dce8e4;
+  --color-cardInk3: #a8bdb5;
+  --color-cardSendBg: #6bcfb8;
+  --color-cardSendFg: #0e1513;
+  --color-cardFocus: #6bcfb8;
   --color-emerald: #34d399;
-  --color-cardInk: #0a0908;
-  --color-cardInk2: #1f1c18;
-  --color-cardInk3: #4a453c;
   --color-st-respond: #80c480;
   --color-st-narrow: #6bcfb8;
   --color-st-flag: #d9b45a;
@@ -256,11 +267,32 @@ button {
 .chat-dim-scrim {
   position: absolute;
   inset: 0;
-  background: var(--color-dimScrim);
-  opacity: 1;
-  animation: ziyada-dim-fade-in 400ms ease-out;
   pointer-events: none;
   z-index: 0;
+  animation: ziyada-dim-fade-in 400ms ease-out;
+}
+
+:root .chat-dim-scrim,
+:root[data-theme='parchment'] .chat-dim-scrim {
+  background-color: #f4f0e6;
+  background-image: radial-gradient(
+    ellipse 78% 68% at 50% 44%,
+    #bdb298 0%,
+    #c9bfa3 28%,
+    rgba(201, 191, 163, 0.58) 52%,
+    rgba(244, 240, 230, 0) 74%
+  );
+}
+
+[data-theme='obsidian'] .chat-dim-scrim {
+  background-color: #0e1513;
+  background-image: radial-gradient(
+    ellipse 78% 68% at 50% 44%,
+    #2a3832 0%,
+    #243029 28%,
+    rgba(36, 48, 41, 0.45) 52%,
+    rgba(14, 21, 19, 0) 74%
+  );
 }
 
 .chat-card {
@@ -278,9 +310,8 @@ button {
 
 [data-theme='obsidian'] .chat-card {
   box-shadow:
-    0 28px 72px rgba(0, 0, 0, 0.55),
-    0 8px 24px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.06);
+    0 24px 56px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(107, 207, 184, 0.1);
 }
 
 .chat-card *,
@@ -288,8 +319,8 @@ button {
   color: inherit;
 }
 
-.chat-card button,
-.chat-card button * {
+.chat-card button:not(.field-send-btn):not(.field-stop-btn),
+.chat-card button:not(.field-send-btn):not(.field-stop-btn) * {
   color: unset;
 }
 

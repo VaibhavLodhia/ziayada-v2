@@ -88,7 +88,7 @@ export function Field({
       className={cn(
         'w-full border-b px-1.5 pb-3 pt-2 transition-colors',
         cardMode
-          ? 'border-[var(--color-cardEdge)] focus-within:border-[var(--color-cardInk)]'
+          ? 'border-[var(--color-cardEdge)] focus-within:border-[var(--color-cardFocus)]'
           : 'border-rule focus-within:border-seal',
         chatMode ? 'max-w-[640px]' : '',
         className,
@@ -152,7 +152,7 @@ export function Field({
               className={cn(
                 'relative flex h-9 w-9 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40',
                 cardMode
-                  ? 'text-[var(--color-cardInk3)] hover:bg-[var(--color-cardEdge)] hover:text-[var(--color-cardInk)]'
+                  ? 'text-[var(--color-cardInk2)] hover:bg-[var(--color-cardEdge)] hover:text-[var(--color-cardInk)]'
                   : 'text-ink3 hover:bg-ground2 hover:text-seal',
                 liveVoice
                   ? 'animate-[ziayada-pulse_1.4s_ease-in-out_infinite] bg-seal text-ground hover:bg-seal'
@@ -179,9 +179,9 @@ export function Field({
               onClick={onStop}
               aria-label="Stop generating"
               className={cn(
-                'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors hover:text-white',
+                'field-stop-btn flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors hover:text-white',
                 cardMode
-                  ? 'border-[var(--color-cardInk)] hover:bg-[var(--color-cardInk)]'
+                  ? 'border-seal text-seal hover:bg-seal hover:text-[var(--color-cardSendFg)]'
                   : 'border-ink hover:bg-ink',
               )}
             >
@@ -196,20 +196,17 @@ export function Field({
               onClick={onSubmit}
               aria-label="Send"
               className={cn(
-                'flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40',
+                'field-send-btn flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40',
                 value.trim()
-                  ? 'bg-[var(--color-cardInk)] text-white'
+                  ? cardMode
+                    ? 'text-[var(--color-cardInk)] hover:bg-[var(--color-cardEdge)]'
+                    : 'text-ink hover:bg-ground2'
                   : cardMode
                     ? 'text-[var(--color-cardInk3)]'
-                    : 'text-inkFaint hover:bg-ground2 hover:text-seal',
-                !cardMode && value.trim() ? 'bg-ink text-ground hover:bg-seal' : '',
+                    : 'text-inkFaint hover:bg-ground2 hover:text-ink',
               )}
             >
-              <ArrowRight
-                size={16}
-                strokeWidth={2.25}
-                className={value.trim() ? 'text-white' : undefined}
-              />
+              <ArrowRight size={18} strokeWidth={2.25} className="pointer-events-none shrink-0" />
             </button>
           )
         ) : null}

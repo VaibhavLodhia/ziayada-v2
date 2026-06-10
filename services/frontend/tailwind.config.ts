@@ -25,8 +25,8 @@ const config: Config = {
       fontFamily: {
         display: ['Fraunces', 'Georgia', 'serif'],
         body: ['Fraunces', 'Georgia', 'serif'],
-        mono: ['Geist Mono', 'monospace'],
-        sans: ['Geist', 'system-ui', 'sans-serif'],
+        sans: ['Fraunces', 'Georgia', 'serif'],
+        mono: ['Geist Mono', 'Fraunces', 'Georgia', 'serif'],
       },
       letterSpacing: {
         'wide-1': '0.08em',
