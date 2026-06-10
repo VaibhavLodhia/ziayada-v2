@@ -13,7 +13,7 @@ export function LoadingScreen({ className }: LoadingScreenProps) {
       )}
     >
       <div className="inline-flex items-center gap-2 font-display text-3xl italic tracking-tight text-[#FAF7ED]">
-        <span>Ziayada</span>
+        <span>Ziyada</span>
         <span className="h-2 w-2 rounded-full bg-[#10B981]" aria-hidden />
       </div>
     </div>

@@ -231,7 +231,7 @@ button {
   }
 }
 
-@keyframes ziyada-pulse-dot {
+@keyframes ziayada-pulse-dot {
   0%,
   100% {
     transform: scale(1);
@@ -245,7 +245,7 @@ button {
   }
 }
 
-@keyframes ziyada-dim-fade-in {
+@keyframes ziayada-dim-fade-in {
   from {
     opacity: 0;
   }
@@ -254,7 +254,7 @@ button {
   }
 }
 
-@keyframes ziyada-card-rise {
+@keyframes ziayada-card-rise {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -270,7 +270,7 @@ button {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  animation: ziyada-dim-fade-in 400ms ease-out;
+  animation: ziayada-dim-fade-in 400ms ease-out;
 }
 
 :root .chat-dim-scrim,
@@ -306,7 +306,7 @@ button {
     0 32px 80px rgba(10, 9, 8, 0.28),
     0 8px 20px rgba(10, 9, 8, 0.14);
   border: 1px solid var(--color-cardEdge);
-  animation: ziyada-card-rise 480ms cubic-bezier(0.2, 0, 0, 1);
+  animation: ziayada-card-rise 480ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 [data-theme='obsidian'] .chat-card {
@@ -336,5 +336,5 @@ button {
   height: 10px;
   border-radius: 50%;
   background: var(--color-emerald);
-  animation: ziyada-pulse-dot 1200ms cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: ziayada-pulse-dot 1200ms cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
