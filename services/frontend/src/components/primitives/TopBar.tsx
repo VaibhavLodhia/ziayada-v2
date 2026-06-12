@@ -48,7 +48,7 @@ export function TopBar({ dateLabel, className }: TopBarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const computedDateLabel = useMemo(() => dateLabel ?? formatDateLabel(new Date()), [dateLabel]);
-  const identityName = user?.name ?? 'Identity';
+  const identityName = user?.name ?? 'Principle';
   const identityInitials = initials(identityName);
   const center =
     location.pathname === '/decide' && phase === 'question' && questions.length > 0

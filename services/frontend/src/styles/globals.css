@@ -23,7 +23,6 @@
   --color-inkFaint: #6b6457;
   --color-seal: #143753;
   --color-sealGlow: #e8e4d8;
-  --color-dimScrim: #b8ac8e;
   --color-cardBg: #ffffff;
   --color-cardEdge: #e8e1cc;
   --color-cardInk: #0a0908;
@@ -245,15 +244,6 @@ button {
   }
 }
 
-@keyframes ziayada-dim-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 @keyframes ziayada-card-rise {
   from {
     opacity: 0;
@@ -263,37 +253,6 @@ button {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.chat-dim-scrim {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  animation: ziayada-dim-fade-in 400ms ease-out;
-}
-
-:root .chat-dim-scrim,
-:root[data-theme='parchment'] .chat-dim-scrim {
-  background-color: #f4f0e6;
-  background-image: radial-gradient(
-    ellipse 78% 68% at 50% 44%,
-    var(--color-dimScrim) 0%,
-    #c2b698 28%,
-    rgba(184, 172, 142, 0.62) 52%,
-    rgba(244, 240, 230, 0) 74%
-  );
-}
-
-[data-theme='obsidian'] .chat-dim-scrim {
-  background-color: #0e1513;
-  background-image: radial-gradient(
-    ellipse 78% 68% at 50% 44%,
-    #2a3832 0%,
-    #243029 28%,
-    rgba(36, 48, 41, 0.45) 52%,
-    rgba(14, 21, 19, 0) 74%
-  );
 }
 
 .chat-card {

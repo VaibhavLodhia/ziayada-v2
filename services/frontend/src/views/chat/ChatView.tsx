@@ -216,12 +216,10 @@ export function ChatView() {
 
   if (!started) {
     return (
-      <div className="relative flex min-h-[calc(100vh-56px)] flex-1 flex-col items-center bg-ground px-6 py-8">
-        <div className="chat-dim-scrim" aria-hidden="true" />
+      <div className="flex min-h-[calc(100vh-56px)] flex-1 flex-col items-center bg-ground px-6 py-8">
+        <div className="mb-6 w-full max-w-[760px]">{pageHeader}</div>
 
-        <div className="relative z-10 mb-6 w-full max-w-[760px]">{pageHeader}</div>
-
-        <div className="relative z-10 flex w-full max-w-[760px] flex-1 flex-col justify-center pb-8">
+        <div className="flex w-full max-w-[760px] flex-1 flex-col justify-center pb-8">
           <div className="chat-card relative flex w-full flex-col">
             <div className="px-6 py-8 text-center">
               <p className="font-display text-lg italic text-[var(--color-cardInk)]">

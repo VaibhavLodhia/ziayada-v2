@@ -48,7 +48,7 @@ export function ChatMessages({ messages, streaming, inCard = false }: ChatMessag
         }
 
         return (
-          <div key={i} className="max-w-[90%] border-l-2 border-seal pl-4">
+          <div key={i} className="max-w-[90%]">
             {meta ? (
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <StatePill state={meta.state} />

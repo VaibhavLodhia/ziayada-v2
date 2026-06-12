@@ -55,7 +55,7 @@ export function NavSidebar({ open }: NavSidebarProps) {
       )}
     >
       <div className="border-b border-ruleSoft px-4 pb-3 pt-[3.75rem]">
-        <div className="font-display text-sm italic text-ink">Identity</div>
+        <div className="font-display text-sm italic text-ink">Principle</div>
         <div className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-ink3">
           {user?.email ?? 'Signed in'}
         </div>
