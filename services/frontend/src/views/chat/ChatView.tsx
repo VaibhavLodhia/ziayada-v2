@@ -221,20 +221,11 @@ export function ChatView() {
 
         <div className="flex w-full max-w-[760px] flex-1 flex-col justify-center pb-8">
           <div className="chat-card relative flex w-full flex-col">
-            <div className="px-6 py-8 text-center">
-              <p className="font-display text-lg italic text-[var(--color-cardInk)]">
-                Private by design. Your conversation stays in your ledger.
-              </p>
-              <p className="mt-2 font-mono text-[10px] uppercase tracking-wide-3 text-[var(--color-cardInk2)]">
-                Ask anything. Use Record a decision when you want the structured interview.
-              </p>
-            </div>
-
             {chatError ? (
-              <p className="px-6 pb-2 text-center font-display italic text-seal">{chatError}</p>
+              <p className="px-6 pt-6 text-center font-display italic text-seal">{chatError}</p>
             ) : null}
 
-            <div className="border-t border-[var(--color-cardEdge)] px-5 py-3">{chatField}</div>
+            <div className="px-5 py-3">{chatField}</div>
           </div>
         </div>
       </div>
